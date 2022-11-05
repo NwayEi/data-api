@@ -1,7 +1,6 @@
 # pylint: disable=missing-module-docstring
 
 import sys
-import urllib.parse
 import requests
 
 BASE_URI = "https://weather.lewagon.com"
@@ -18,15 +17,17 @@ def search_city(query):
         if len(response) > 1 :
             for index, item in enumerate(response):
                 print(f"{index+1}. {item.get('name')},{item.get('country')}")
+
             print("Multiple matches found, which city did you mean?")
             index_input = input("")
             index_input =int(index_input)-1
+
             return response[index_input]
 
         else:
             return response[0]
-    else:
-        return None
+
+    return None
 
 def weather_forecast(lat, lon):
     '''Return a 5-day weather forecast for the city, given its latitude and longitude.'''
@@ -35,8 +36,8 @@ def weather_forecast(lat, lon):
     response = requests.get(BASE_URI+"/data/2.5/forecast?lat="+lat_str+"&lon="+lon_str+"&units=metric").json()
     if response != []:
         return response.get('list')
-    else:
-        return None
+
+    return None
 
 def main():
     '''Ask user for a city and display weather forecast'''
@@ -46,7 +47,8 @@ def main():
         if city is not None :
             break
 
-    five_day_weather = weather_forecast(str(city.get('lat')),str(city.get('lon')))
+    five_day_weather = weather_forecast(city.get('lat'),city.get('lon'))
+
     print(f"Here's the weather in {city.get('name')}")
     for weather in five_day_weather:
         print( f"{weather.get('dt_txt').split(' ')[0]} {weather.get('weather')[0]['description']} {get('main').get('temp_max')}°C")
