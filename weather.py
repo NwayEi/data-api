@@ -11,18 +11,45 @@ def search_city(query):
     '''Look for a given city. If multiple options are returned, have the user choose between them.
        Return one city (or None)
     '''
-    pass  # YOUR CODE HERE
+    query = query.strip()
+    response = requests.get(BASE_URI+"/geo/1.0/direct?q="+query+"&limit=10").json()
+
+    if response != []:
+        if len(response) > 1 :
+            for index, item in enumerate(response):
+                print(f"{index+1}. {item.get('name')},{item.get('country')}")
+            print("Multiple matches found, which city did you mean?")
+            index_input = input("")
+            index_input =int(index_input)-1
+            return response[index_input]
+
+        else:
+            return response[0]
+    else:
+        return None
 
 def weather_forecast(lat, lon):
     '''Return a 5-day weather forecast for the city, given its latitude and longitude.'''
-    pass  # YOUR CODE HERE
+    lat_str = str(lat)
+    lon_str = str(lon)
+    response = requests.get(BASE_URI+"/data/2.5/forecast?lat="+lat_str+"&lon="+lon_str+"&units=metric").json()
+    if response != []:
+        return response.get('list')
+    else:
+        return None
 
 def main():
     '''Ask user for a city and display weather forecast'''
-    query = input("City?\n> ")
-    city = search_city(query)
-    # TODO: Display weather forecast for a given city
-    pass  # YOUR CODE HERE
+    while True:
+        query = input("City?\n> ")
+        city = search_city(query)
+        if city is not None :
+            break
+
+    five_day_weather = weather_forecast(str(city.get('lat')),str(city.get('lon')))
+    print(f"Here's the weather in {city.get('name')}")
+    for weather in five_day_weather:
+        print( f"{weather.get('dt_txt').split(' ')[0]} {weather.get('weather')[0]['description']} {get('main').get('temp_max')}°C")
 
 if __name__ == '__main__':
     try:
